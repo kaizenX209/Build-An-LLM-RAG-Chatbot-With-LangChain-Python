@@ -47,15 +47,15 @@ Option: Cài đặt attu để view data đã seed vào Milvus:
 1. Tạo file `.env`
 2. Truy cập OpenAI để lấy OPENAI_API_KEY:https://platform.openai.com/api-keys
 3. Thêm API key vào file .env:
-   OPENAI_API_KEY=sk-your-api-key-here
+  - OPENAI_API_KEY=sk-your-api-key-here
 
 Options: Cấu hình Langsmith:
 1. Truy cập langsmith để lấy LANGCHAIN_API_KEY: https://smith.langchain.com/
 2. Thêm 4 dòng sau vào .env:
-  LANGCHAIN_TRACING_V2=true
-  LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-  LANGCHAIN_API_KEY="your-langchain-api-key-here"
-  LANGCHAIN_PROJECT="project name"
+  - LANGCHAIN_TRACING_V2=true
+  - LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+  - LANGCHAIN_API_KEY="your-langchain-api-key-here"
+  - LANGCHAIN_PROJECT="project-name"
 
 ### Bước 5: Chạy ứng dụng
 
