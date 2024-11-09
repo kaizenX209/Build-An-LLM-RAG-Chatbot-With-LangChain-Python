@@ -62,7 +62,7 @@ Options: Cấu hình Langsmith:
 - Crawl data về local trước khi bắt đầu chạy ứng dụng. Mở Terminal/Command Prompt, di chuyển vào thư mục src và chạy:
 
   - cd src
-  - python crawl_data.py
+  - python crawl.py
 
 - Sau đó chạy ứng dụng bằng câu lệnh:
 
