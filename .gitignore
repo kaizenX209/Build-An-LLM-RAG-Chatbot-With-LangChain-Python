@@ -2,3 +2,5 @@
 .env
 .venv
 volumes/
+__pycache__/
+*.pyc
