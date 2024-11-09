@@ -59,15 +59,21 @@ Options: Cấu hình Langsmith:
 
 ### Bước 5: Chạy ứng dụng
 
-- Crawl data về local trước khi bắt đầu chạy ứng dụng. Mở Terminal/Command Prompt, di chuyển vào thư mục src và chạy:
-
-  - cd src
-  - python crawl_data.py
-
-- Sau đó chạy ứng dụng bằng câu lệnh:
-
-  - streamlit run main.py
-
+1. Crawl data về local 
+Mở Terminal/Command Prompt, di chuyển vào thư mục src  `cd src` và chạy:
+```python
+python crawl.py
+```
+2. Seed data vào Milvus:
+```python 
+python seed_data.py
+```
+(Kiểm tra data đã aào Milvus chưa bằng cách truy cập: http://localhost:8000/#/databases/default/colletions
+<Nhớ để ý `docker run -p 8000:3000 -e MILVUS_URL={milvus server IP}:19530 zilliz/attu:v2.4` để chắc chắn Milvus đang hoạt động >)
+3. Run ứng dụng:
+```python
+streamlit run main.py
+```
 ## 💻 Cách sử dụng
 
 ### 1. Khởi động ứng dụng

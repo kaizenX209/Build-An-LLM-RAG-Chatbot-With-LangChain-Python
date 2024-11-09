@@ -78,7 +78,7 @@ def get_llm_and_agent(_retriever) -> AgentExecutor:
         - Sử dụng chat history để duy trì ngữ cảnh hội thoại
     """
     # Khởi tạo ChatOpenAI với chế độ streaming
-    llm = ChatOpenAI(temperature=0, streaming=True, model="gpt-4")
+    llm = ChatOpenAI(temperature=0, streaming=True, model="gpt-4o-mini")
     tools = [tool]
     
     # Thiết lập prompt template cho agent
