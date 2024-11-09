@@ -170,6 +170,8 @@ def handle_user_input(msgs, agent_executor):
         st.session_state.messages.append({"role": "human", "content": prompt})
         st.chat_message("human").write(prompt)
         msgs.add_user_message(prompt)
+        print("--------------------------------")
+        print(f"[LOG] User message: {prompt}")  # Track user input
 
         # Xử lý và hiển thị câu trả lời
         with st.chat_message("assistant"):
@@ -195,6 +197,7 @@ def handle_user_input(msgs, agent_executor):
             st.session_state.messages.append({"role": "assistant", "content": output})
             msgs.add_ai_message(output)
             st.write(output)
+
 
 # === HÀM CHÍNH ===
 def main():
