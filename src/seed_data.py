@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from uuid import uuid4
 from crawl import crawl_web
 from langchain_ollama import OllamaEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
 
@@ -46,10 +47,14 @@ def seed_milvus(URI_link: str, collection_name: str, filename: str, directory: s
     else:
         embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
     
-    # Đọc dữ liệu từ file local
-    local_data, doc_name = load_data_from_local(filename, directory)
-
-    # Chuyển đổi dữ liệu thành danh sách các Document với giá trị mặc định cho các trường
+    # Determine file type and load accordingly
+    file_extension = filename.split('.')[-1].lower()
+    if file_extension == 'txt':
+        local_data, doc_name = load_text_file(filename, directory)
+    else:
+        local_data, doc_name = load_data_from_local(filename, directory)
+    
+    # Convert to Document objects
     documents = [
         Document(
             page_content=doc.get('page_content') or '',
@@ -76,7 +81,7 @@ def seed_milvus(URI_link: str, collection_name: str, filename: str, directory: s
         embedding_function=embeddings,
         connection_args={"uri": URI_link},
         collection_name=collection_name,
-        drop_old=True  # Xóa data đã tồn tại trong collection
+        drop_old=True
     )
     # Thêm documents vào Milvus
     vectorstore.add_documents(documents=documents, ids=uuids)
@@ -147,19 +152,66 @@ def connect_to_milvus(URI_link: str, collection_name: str) -> Milvus:
     )
     return vectorstore
 
+def load_text_file(filename: str, directory: str) -> list:
+    """
+    Load and process text file into documents
+    Args:
+        filename (str): Name of text file to read
+        directory (str): Directory containing the file
+    Returns:
+        list: List of dictionaries with page_content and metadata
+    """
+    file_path = os.path.join(directory, filename)
+    
+    with open(file_path, 'r', encoding='utf-8') as file:
+        text = file.read()
+        
+    # Split text into chunks
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=30,
+        chunk_overlap=5,
+        length_function=len
+    )
+    
+    chunks = text_splitter.split_text(text)
+    
+    # Create document format matching JSON structure
+    documents = []
+    for i, chunk in enumerate(chunks):
+        documents.append({
+            'page_content': chunk,
+            'metadata': {
+                'source': file_path,
+                'content_type': 'text/plain',
+                'title': filename,
+                'description': f'Part {i+1} of {filename}',
+                'language': 'en',
+                'start_index': i
+            }
+        })
+    
+    return documents, filename.rsplit('.', 1)[0].replace('_', ' ')
+
 def main():
     """
     Hàm chính để kiểm thử các chức năng của module
     Thực hiện:
         1. Test seed_milvus với dữ liệu từ file local 'stack.json'
-        2. (Đã comment) Test seed_milvus_live với dữ liệu từ trang web stack-ai
+        2. Test seed_milvus với dữ liệu từ file text 'sample.txt'
+        3. (Đã comment) Test seed_milvus_live với dữ liệu từ trang web stack-ai
     Chú ý:
         - Đảm bảo Milvus server đang chạy tại localhost:19530
         - Các biến môi trường cần thiết (như OPENAI_API_KEY) đã được cấu hình
     """
-    # Test seed_milvus với dữ liệu local
-    seed_milvus('http://localhost:19530', 'data_test', 'stack.json', 'data', use_ollama=False)
-    # Test seed_milvus_live với URL trực tiếp
+    # Test với file JSON
+    print("\nTesting with JSON file...")
+    # seed_milvus('http://localhost:19530', 'data_test', 'stack.json', 'data', use_ollama=False)
+    
+    # Test với file text
+    print("\nTesting with text file...")
+    seed_milvus('http://localhost:19530', 'fairy_tale', 'sample.txt', 'data', use_ollama=False)
+    
+    # Test seed_milvus_live với URL trực tiếp (commented)
     # seed_milvus_live('https://www.stack-ai.com/docs', 'http://localhost:19530', 'data_test_live', 'stack-ai', use_ollama=False)
 
 # Chạy main() nếu file được thực thi trực tiếp
