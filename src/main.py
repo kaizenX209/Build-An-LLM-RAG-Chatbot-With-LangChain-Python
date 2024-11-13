@@ -44,7 +44,7 @@ def setup_sidebar():
     with st.sidebar:
         st.title("⚙️ Cấu hình")
         
-        # Phần 1: Chọn Embeddings Model trước
+        # Phần 1: Chọn Embeddings Model
         st.header("🔤 Embeddings Model")
         embeddings_choice = st.radio(
             "Chọn Embeddings Model:",
@@ -64,15 +64,23 @@ def setup_sidebar():
             handle_local_file(use_ollama_embeddings)
         else:
             handle_url_input(use_ollama_embeddings)
+            
+        # Thêm phần chọn collection để query
+        st.header("🔍 Collection để truy vấn")
+        collection_to_query = st.text_input(
+            "Nhập tên collection cần truy vấn:",
+            "data_test",
+            help="Nhập tên collection bạn muốn sử dụng để tìm kiếm thông tin"
+        )
         
-        # Phần 3: Chọn Model để trả lời (độc lập với embeddings)
+        # Phần 3: Chọn Model để trả lời
         st.header("🤖 Model AI")
         model_choice = st.radio(
             "Chọn AI Model để trả lời:",
-            ["OpenAI GPT", "Ollama (Local)"]
+            ["OpenAI GPT-4", "OpenAI Grok", "Ollama (Local)"]
         )
         
-        return model_choice
+        return model_choice, collection_to_query
 
 def handle_local_file(use_ollama_embeddings: bool):
     """
@@ -138,8 +146,10 @@ def setup_chat_interface(model_choice):
     st.title("💬 AI Assistant")
     
     # Caption động theo model
-    if model_choice == "OpenAI GPT":
+    if model_choice == "OpenAI GPT-4":
         st.caption("🚀 Trợ lý AI được hỗ trợ bởi LangChain và OpenAI GPT-4")
+    elif model_choice == "OpenAI Grok":
+        st.caption("🚀 Trợ lý AI được hỗ trợ bởi LangChain và X.AI Grok")
     else:
         st.caption("🚀 Trợ lý AI được hỗ trợ bởi LangChain và Ollama LLaMA2")
     
@@ -202,15 +212,18 @@ def main():
     Hàm chính điều khiển luồng chương trình
     """
     initialize_app()
-    model_choice = setup_sidebar()  # Chỉ cần trả về model choice để xử lý chat
+    model_choice, collection_to_query = setup_sidebar()
     msgs = setup_chat_interface(model_choice)
     
     # Khởi tạo AI dựa trên lựa chọn model để trả lời
-    if model_choice == "OpenAI GPT":
-        retriever = get_openai_retriever()
-        agent_executor = get_openai_agent(retriever)
+    if model_choice == "OpenAI GPT-4":
+        retriever = get_openai_retriever(collection_to_query)
+        agent_executor = get_openai_agent(retriever, "gpt4")
+    elif model_choice == "OpenAI Grok":
+        retriever = get_openai_retriever(collection_to_query)
+        agent_executor = get_openai_agent(retriever, "grok")
     else:
-        retriever = get_ollama_retriever()
+        retriever = get_ollama_retriever(collection_to_query)
         agent_executor = get_ollama_agent(retriever)
     
     handle_user_input(msgs, agent_executor)
