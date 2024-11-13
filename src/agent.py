@@ -9,6 +9,18 @@ from langchain_community.chat_message_histories import StreamlitChatMessageHisto
 from langchain.retrievers import EnsembleRetriever  # Kết hợp nhiều retriever
 from langchain_community.retrievers import BM25Retriever  # Retriever dựa trên BM25
 from langchain_core.documents import Document  # Lớp Document
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise ValueError("OPENAI_API_KEY not found in environment variables")
+
+XAI_API_KEY = os.getenv("XAI_API_KEY")
+if not XAI_API_KEY:
+    raise ValueError("XAI_API_KEY not found in environment variables")
 
 def get_retriever(collection_name: str = "data_test") -> EnsembleRetriever:
     """
@@ -61,24 +73,28 @@ tool = create_retriever_tool(
     "Search for information of Stack AI."
 )
 
-def get_llm_and_agent(_retriever) -> AgentExecutor:
+def get_llm_and_agent(_retriever, model_choice="gpt4") -> AgentExecutor:
     """
     Khởi tạo Language Model và Agent với cấu hình cụ thể
     Args:
         _retriever: Retriever đã được cấu hình để tìm kiếm thông tin
-    Returns:
-        AgentExecutor: Agent đã được cấu hình với:
-            - Model: GPT-4
-            - Temperature: 0
-            - Streaming: Enabled
-            - Custom system prompt
-    Chú ý:
-        - Yêu cầu OPENAI_API_KEY đã được cấu hình
-        - Agent được thiết lập với tên "ChatchatAI"
-        - Sử dụng chat history để duy trì ngữ cảnh hội thoại
+        model_choice: Lựa chọn model ("gpt4" hoặc "grok")
     """
-    # Khởi tạo ChatOpenAI với chế độ streaming
-    llm = ChatOpenAI(temperature=0, streaming=True, model="gpt-4")
+    # Khởi tạo ChatOpenAI dựa trên lựa chọn model
+    if model_choice == "gpt4":
+        llm = ChatOpenAI(
+            temperature=0,
+            streaming=True,
+            model='gpt-4',
+            api_key=OPENAI_API_KEY)
+    else:  # grok
+        llm = ChatOpenAI(
+            temperature=0, 
+            streaming=True, 
+            model='grok-beta', 
+            api_key=XAI_API_KEY, 
+            base_url='https://api.x.ai/v1')
+    
     tools = [tool]
     
     # Thiết lập prompt template cho agent
