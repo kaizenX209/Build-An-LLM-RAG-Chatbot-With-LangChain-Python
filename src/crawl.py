@@ -33,7 +33,7 @@ def crawl_web(url_data):
     print('length: ', len(docs))  # In số lượng tài liệu đã tải
     
     # Chia nhỏ văn bản thành các đoạn 10000 ký tự, với 500 ký tự chồng lấp
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=500)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=50)
     all_splits = text_splitter.split_documents(docs)
     print('length_all_splits: ', len(all_splits))  # In số lượng đoạn văn bản sau khi chia
     return all_splits

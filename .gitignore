@@ -1,5 +1,5 @@
 # Ko lưu .env, .venv, và thư mục volumes (data của Docker khi run local Milvus)
-.env
+*.env
 .venv
 volumes/
 __pycache__/

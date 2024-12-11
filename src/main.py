@@ -7,13 +7,26 @@ Chức năng:
 """
 
 # === IMPORT CÁC THƯ VIỆN CẦN THIẾT ===
+import os
+from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
 import streamlit as st  # Thư viện tạo giao diện web
-from dotenv import load_dotenv  # Đọc file .env chứa API key
 from seed_data import seed_milvus, seed_milvus_live  # Hàm xử lý dữ liệu
 from agent import get_retriever as get_openai_retriever, get_llm_and_agent as get_openai_agent
 from local_ollama import get_retriever as get_ollama_retriever, get_llm_and_agent as get_ollama_agent
 from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+
+# In ra đường dẫn hiện tại
+print("Current working directory:", os.getcwd())
+
+# Tìm và in ra đường dẫn của file .env
+env_path = find_dotenv()
+print("Found .env at:", env_path)
+
+# Load .env và in ra giá trị
+load_dotenv(env_path)
+print("OPENAI_API_KEY:", os.getenv("OPENAI_API_KEY"))
 
 # === THIẾT LẬP GIAO DIỆN TRANG WEB ===
 def setup_page():

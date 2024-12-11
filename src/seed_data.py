@@ -168,8 +168,8 @@ def load_text_file(filename: str, directory: str) -> list:
         
     # Split text into chunks
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=30,
-        chunk_overlap=5,
+        chunk_size=800,
+        chunk_overlap=50,
         length_function=len
     )
     
@@ -205,11 +205,11 @@ def main():
     """
     # Test với file JSON
     print("\nTesting with JSON file...")
-    # seed_milvus('http://localhost:19530', 'data_test', 'stack.json', 'data', use_ollama=False)
+    seed_milvus('http://localhost:19530', 'stack_ai', 'stack.json', 'data', use_ollama=False)
     
     # Test với file text
     print("\nTesting with text file...")
-    seed_milvus('http://localhost:19530', 'fairy_tale', 'sample.txt', 'data', use_ollama=False)
+    seed_milvus('http://localhost:19530', 'sample', 'sample.txt', 'data', use_ollama=False)
     
     # Test seed_milvus_live với URL trực tiếp (commented)
     # seed_milvus_live('https://www.stack-ai.com/docs', 'http://localhost:19530', 'data_test_live', 'stack-ai', use_ollama=False)
